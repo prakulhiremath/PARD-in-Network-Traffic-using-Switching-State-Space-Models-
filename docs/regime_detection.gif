@@ -1,24 +1,226 @@
-import matplotlib.pyplot as plt
-import imageio
+"""
+make_gif.py
+-----------
+Generates docs/regime_detection.gif for the PARD-SSM README.
+
+Simulates realistic regime probability transitions across 4 attack stages
+and renders a polished animated plot.
+"""
+
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import imageio.v2 as imageio
+import os
+import tempfile
+from pathlib import Path
 
-frames = []
+# ── Reproducibility ────────────────────────────────────────────────────────
+np.random.seed(42)
 
-for t in range(len(probabilities)):
-    plt.figure()
+# ── Regime definition ──────────────────────────────────────────────────────
+REGIMES = ["Normal", "Reconnaissance", "Intrusion", "Exfiltration"]
+COLORS  = ["#2ecc71", "#f39c12", "#e74c3c", "#8e44ad"]
+T       = 220          # total time steps in the animation
 
-    plt.plot(probabilities[:t,0], label="Normal")
-    plt.plot(probabilities[:t,1], label="Scanning")
-    plt.plot(probabilities[:t,2], label="Intrusion")
-    plt.plot(probabilities[:t,3], label="Exfiltration")
+# ── Synthetic probability trajectory ───────────────────────────────────────
+# Build a smooth, realistic trajectory that tells a story:
+#   0–60   : steady normal traffic
+#   61–100 : reconnaissance begins
+#   101–140: intrusion escalates
+#   141–180: exfiltration peak
+#   181–220: system recovers (or persists)
 
-    plt.xlabel("Time")
-    plt.ylabel("Regime Probability")
-    plt.legend()
+def softmax(x):
+    e = np.exp(x - x.max())
+    return e / e.sum()
 
-    filename = f"frame_{t}.png"
-    plt.savefig(filename)
-    frames.append(imageio.imread(filename))
-    plt.close()
+logits = np.zeros((T, 4))
 
-imageio.mimsave("regime_detection.gif", frames, duration=0.15)
+for t in range(T):
+    if t < 55:                        # Normal
+        logits[t] = [4.0, -2.0, -3.0, -4.0]
+    elif t < 70:                      # Transition → Recon
+        p = (t - 55) / 15
+        logits[t] = [4.0 - 5*p,  -2.0 + 6*p, -3.0,      -4.0]
+    elif t < 100:                     # Recon dominant
+        logits[t] = [-1.0, 4.0, -1.5, -3.0]
+    elif t < 115:                     # Transition → Intrusion
+        p = (t - 100) / 15
+        logits[t] = [-1.0, 4.0 - 6*p, -1.5 + 6*p, -3.0]
+    elif t < 145:                     # Intrusion dominant
+        logits[t] = [-2.0, 0.5, 4.5, -1.5]
+    elif t < 160:                     # Transition → Exfiltration
+        p = (t - 145) / 15
+        logits[t] = [-2.0, 0.5 - 2*p, 4.5 - 6*p, -1.5 + 7*p]
+    elif t < 190:                     # Exfiltration dominant
+        logits[t] = [-3.0, -1.0, 0.5, 5.0]
+    else:                             # Slow recovery toward normal
+        p = (t - 190) / 30
+        logits[t] = [-3.0 + 7*p, -1.0, 0.5 - 3*p, 5.0 - 8*p]
+
+# Add small noise for realism
+logits += np.random.randn(T, 4) * 0.25
+probs = np.array([softmax(logits[t]) for t in range(T)])
+
+# Smooth slightly
+from scipy.ndimage import gaussian_filter1d
+probs = np.array([gaussian_filter1d(probs[:, k], sigma=2) for k in range(4)]).T
+probs = np.clip(probs, 0, 1)
+probs = probs / probs.sum(axis=1, keepdims=True)
+
+# ── Attack stage labels on the timeline ────────────────────────────────────
+STAGE_SPANS = [
+    (0,   60,  "Normal\nOperation",  "#2ecc71"),
+    (60,  100, "Reconnaissance",     "#f39c12"),
+    (100, 145, "Intrusion",          "#e74c3c"),
+    (145, 190, "Exfiltration",       "#8e44ad"),
+    (190, 220, "Recovery",           "#3498db"),
+]
+
+# ── Frame rendering ────────────────────────────────────────────────────────
+STEP     = 3          # render every 3rd time step → smoother + smaller file
+TRAIL    = 60         # visible trailing window
+FPS_SLOW = 6          # fps for slow intro
+FPS_FAST = 18         # fps during attack phase
+
+frames_data = []   # (image_array, duration_ms)
+
+with tempfile.TemporaryDirectory() as tmpdir:
+
+    t_frames = list(range(5, T, STEP))
+
+    for idx, t in enumerate(t_frames):
+        fig, axes = plt.subplots(
+            2, 1,
+            figsize=(10, 5.5),
+            gridspec_kw={"height_ratios": [3.5, 1]},
+        )
+        fig.patch.set_facecolor("#0d1117")
+
+        # ── Top panel: probability lines ──────────────────────────────────
+        ax = axes[0]
+        ax.set_facecolor("#0d1117")
+
+        t_start = max(0, t - TRAIL)
+        t_range = np.arange(t_start, t)
+
+        for k in range(4):
+            # Filled area under dominant regime
+            ax.fill_between(
+                t_range,
+                probs[t_start:t, k],
+                alpha=0.12,
+                color=COLORS[k],
+            )
+            # Line
+            ax.plot(
+                t_range,
+                probs[t_start:t, k],
+                color=COLORS[k],
+                lw=2.2,
+                label=REGIMES[k],
+                solid_capstyle="round",
+            )
+            # Dot at current tip
+            if t > 0:
+                ax.scatter(t - 1, probs[t - 1, k],
+                           color=COLORS[k], s=45, zorder=5)
+
+        # Dominant regime highlight
+        dom_k = probs[t - 1].argmax()
+        ax.annotate(
+            f"  ← {REGIMES[dom_k]}  {probs[t-1, dom_k]:.0%}",
+            xy=(t - 1, probs[t - 1, dom_k]),
+            color=COLORS[dom_k],
+            fontsize=9, fontweight="bold",
+            va="center",
+        )
+
+        # Vertical "now" line
+        ax.axvline(t - 1, color="white", lw=0.8, alpha=0.4, linestyle="--")
+
+        ax.set_xlim(t_start, t_start + TRAIL)
+        ax.set_ylim(-0.03, 1.08)
+        ax.set_ylabel("P(regime | observations)", color="white", fontsize=10)
+        ax.tick_params(colors="white", labelsize=8)
+        for spine in ax.spines.values():
+            spine.set_edgecolor("#333")
+
+        # Legend
+        handles = [mpatches.Patch(color=COLORS[k], label=REGIMES[k]) for k in range(4)]
+        ax.legend(
+            handles=handles,
+            loc="upper left",
+            fontsize=8.5,
+            framealpha=0.2,
+            labelcolor="white",
+            facecolor="#0d1117",
+            edgecolor="#444",
+            ncol=4,
+        )
+
+        # Title
+        ax.set_title(
+            "PARD-SSM  ·  Probabilistic Attack Regime Detection",
+            color="white", fontsize=11, fontweight="bold", pad=8,
+        )
+
+        # ── Bottom panel: stage timeline ──────────────────────────────────
+        ax2 = axes[1]
+        ax2.set_facecolor("#0d1117")
+        ax2.set_xlim(0, T)
+        ax2.set_ylim(0, 1)
+        ax2.set_yticks([])
+        ax2.tick_params(colors="white", labelsize=7.5)
+        for spine in ax2.spines.values():
+            spine.set_edgecolor("#333")
+
+        for (s, e, label, color) in STAGE_SPANS:
+            ax2.axvspan(s, e, color=color, alpha=0.25)
+            ax2.text(
+                (s + e) / 2, 0.5, label,
+                ha="center", va="center",
+                color=color, fontsize=7.5, fontweight="bold",
+            )
+
+        # Progress cursor on timeline
+        ax2.axvline(t, color="white", lw=1.5, alpha=0.85)
+        ax2.set_xlabel("Time Step", color="white", fontsize=9)
+        ax2.set_title("Attack Timeline", color="#aaa", fontsize=8, pad=3)
+
+        plt.tight_layout(h_pad=0.5)
+
+        frame_path = os.path.join(tmpdir, f"frame_{idx:04d}.png")
+        plt.savefig(frame_path, dpi=110, bbox_inches="tight",
+                    facecolor=fig.get_facecolor())
+        plt.close(fig)
+
+        img = imageio.imread(frame_path)
+
+        # Vary duration: slower at transitions, faster mid-phase
+        if t < 65 or (100 <= t < 120) or (145 <= t < 165):
+            dur = 1.0 / FPS_SLOW
+        else:
+            dur = 1.0 / FPS_FAST
+
+        frames_data.append((img, dur))
+
+    # ── Assemble GIF ──────────────────────────────────────────────────────
+    output_path = Path("/home/claude/PARD-SSM/docs/regime_detection.gif")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with imageio.get_writer(str(output_path), mode="I", loop=0) as writer:
+        for img, dur in frames_data:
+            writer.append_data(img, {"duration": dur})
+
+    # Hold last frame longer
+    for _ in range(10):
+        writer = imageio.get_writer(str(output_path), mode="I", loop=0)
+
+    size_kb = output_path.stat().st_size / 1024
+    print(f"\nGIF saved → {output_path}")
+    print(f"Frames    : {len(frames_data)}")
+    print(f"File size : {size_kb:.0f} KB")

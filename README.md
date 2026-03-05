@@ -12,6 +12,8 @@ using **Switching State-Space Models (SSSM)**. The system models network traffic
 stochastic process and infers hidden regimes such as reconnaissance, intrusion, and data exfiltration
 **before attacks fully manifest**.
 
+![Regime Detection](docs/regime_detection.gif)
+
 ---
 
 ## Table of Contents

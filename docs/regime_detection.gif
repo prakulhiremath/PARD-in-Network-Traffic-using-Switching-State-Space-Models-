@@ -1,0 +1,24 @@
+import matplotlib.pyplot as plt
+import imageio
+import numpy as np
+
+frames = []
+
+for t in range(len(probabilities)):
+    plt.figure()
+
+    plt.plot(probabilities[:t,0], label="Normal")
+    plt.plot(probabilities[:t,1], label="Scanning")
+    plt.plot(probabilities[:t,2], label="Intrusion")
+    plt.plot(probabilities[:t,3], label="Exfiltration")
+
+    plt.xlabel("Time")
+    plt.ylabel("Regime Probability")
+    plt.legend()
+
+    filename = f"frame_{t}.png"
+    plt.savefig(filename)
+    frames.append(imageio.imread(filename))
+    plt.close()
+
+imageio.mimsave("regime_detection.gif", frames, duration=0.15)

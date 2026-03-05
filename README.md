@@ -357,8 +357,8 @@ python tests/test_data_processing.py
 | **Sahil Bekane** | 2VX23CS042 | Experiments, testing & benchmarking |
 | **Hemanth B. K.** | 2VX23CS012 | Visualization & documentation |
 
-**Institution:** VTU Affiliated College, Karnataka, India
-**Programme:** B.E. Computer Science & Engineering — Major Project 2025–26
+**Institution:** Visvesvaraya Technological University, Belagavi , Karnataka, India
+**Programme:** B. Tech. Computer Science & Engineering — Major Project 2026–27
 
 </div>
 

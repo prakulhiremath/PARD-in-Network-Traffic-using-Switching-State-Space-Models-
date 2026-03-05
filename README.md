@@ -232,7 +232,7 @@ probabilistic-attack-regime-detection
 Clone the repository.
 
 ```bash
-git clone https://github.com/yourusername/probabilistic-attack-regime-detection.git
+git clone https://github.com/prakulhiremath/PARD-in-Network-Traffic-using-Switching-State-Space-Models-.git
 
 cd probabilistic-attack-regime-detection
 ```

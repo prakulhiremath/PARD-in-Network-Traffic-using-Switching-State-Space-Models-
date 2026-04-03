@@ -366,16 +366,14 @@ python tests/test_data_processing.py
 
 ## Citation
 
-If you use this work in your research, please cite:
+If you use this work in your research, please cite our preprint:
 
 ```bibtex
-@software{hiremath2026pard,
-  author    = {Hiremath, Prakul Sunil and Bagawan, Peerahamad
-               and Bekane, Sahil and {Hemanth, B. K.}},
-  title     = {Probabilistic Attack Regime Detection in Network Traffic
-               using Switching State-Space Models},
-  year      = {2026},
-  url       = {https://github.com/prakulhiremath/PARD-in-Network-Traffic-using-Switching-State-Space-Models-},
+@article{hiremath2026pard,
+  title={PARD-SSM: Probabilistic Cyber-Attack Regime Detection via Variational Switching State-Space Models},
+  author={Hiremath, Prakul Sunil and Bhekane, Sahil and Bagawan, PeerAhammad M},
+  journal={arXiv preprint arXiv:2604.02299},
+  year={2026}
 }
 ```
 

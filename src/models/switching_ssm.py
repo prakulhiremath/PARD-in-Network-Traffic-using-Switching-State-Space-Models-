@@ -205,6 +205,8 @@ def main():
     )
 
     clf.fit(X_train_balanced, y_train_balanced)
+    from src.explainability.shap_explainer import run_shap_analysis
+    run_shap_analysis(clf, X_train_balanced, X_test, rf_features.shape[1])
 
     # -------------------- TEST EVALUATION --------------------
     y_pred = clf.predict(X_test)

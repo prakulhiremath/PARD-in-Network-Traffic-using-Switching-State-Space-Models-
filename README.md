@@ -408,5 +408,5 @@ You may obtain a copy of the License at
 ---
 
 <div align="center">
-<sub>Built with 🔬 for early cyber-attack detection &nbsp;·&nbsp; VTU Karnataka &nbsp;·&nbsp; 2026</sub>
+<sub>Built with 🔬 for early cyber-attack detection &nbsp;·&nbsp; AoE &nbsp;·&nbsp; 2026</sub>
 </div>

@@ -10,6 +10,7 @@
   <img src="https://img.shields.io/badge/Domain-Cybersecurity-E74C3C?style=for-the-badge&logo=shield&logoColor=white"/>
   <img src="https://img.shields.io/badge/ML-State--Space_Models-8E44AD?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/Status-Active_Development-F39C12?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/arXiv-2604.02299-B31B1B?style=for-the-badge&logo=arxiv&logoColor=white"/>
 </p>
 
 <p align="center">

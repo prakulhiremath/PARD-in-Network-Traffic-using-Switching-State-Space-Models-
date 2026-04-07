@@ -114,10 +114,10 @@ Raw Network Telemetry  (PCAP / NetFlow / CICIDS CSV)
                │  Normalize → PCA → Sliding Window
                ▼
     ┌─────────────────────────────────────────────┐
-    │          Switching State-Space Model         │
+    │          Switching State-Space Model        │
     │                                             │
-    │   Hidden State   x_t  ∈ ℝᵈ                 │
-    │   Attack Regime  s_t  ∈ {0, 1, 2, 3, 4, 5} │
+    │   Hidden State   x_t  ∈ ℝᵈ                  │
+    │   Attack Regime  s_t  ∈ {0, 1, 2, 3, 4, 5}  │
     │   Transition     Π    (learned via EM)      │
     └──────────────────┬──────────────────────────┘
                        │

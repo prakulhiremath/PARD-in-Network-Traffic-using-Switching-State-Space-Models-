@@ -357,8 +357,9 @@ python tests/test_data_processing.py
 | **Peerahamad Bagawan** | 2VX23CS029 | Data processing & evaluation pipeline |
 | **Sahil Bekane** | 2VX23CS042 | Experiments, testing & benchmarking |
 | **Hemanth B. K.** | 2VX23CS012 | Visualization & documentation |
+| **Dr. Rashmi R. Rachh (Guide)** | — | Project supervision & guidance |
 
-**Institution:** Visvesvaraya Technological University, Belagavi , Karnataka, India
+**Institution:** Visvesvaraya Technological University, Belagavi, Karnataka, India  
 **Programme:** B. Tech. Computer Science & Engineering — Major Project 2026–27
 
 </div>
@@ -372,7 +373,7 @@ If you use this work in your research, please cite our preprint:
 ```bibtex
 @article{hiremath2026pard,
   title={PARD-SSM: Probabilistic Cyber-Attack Regime Detection via Variational Switching State-Space Models},
-  author={Hiremath, Prakul Sunil and Bhekane, Sahil and Bagawan, PeerAhammad M},
+  author={Hiremath, Prakul Sunil and Bhekane, Sahil and Bagawan, PeerAhammad M and Rachh, Rashmi R.},
   journal={arXiv preprint arXiv:2604.02299},
   year={2026}
 }

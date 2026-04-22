@@ -14,10 +14,9 @@
   <a href="https://arxiv.org/abs/2604.02299">
     <img src="https://img.shields.io/badge/arXiv-2604.02299-B31B1B?style=for-the-badge&logo=arxiv&logoColor=white"/>
   </a>
-
-  <a href="https://doi.org/10.5281/zenodo.19697928">
-    <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.19697928.svg?style=for-the-badge"/>
-  </a>
+<a href="https://doi.org/10.5281/zenodo.19697928">
+  <img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.19697928-blue?style=for-the-badge"/>
+</a>
 </p>
 
 <p align="center">

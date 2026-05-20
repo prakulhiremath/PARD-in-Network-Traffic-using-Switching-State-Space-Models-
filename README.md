@@ -350,6 +350,7 @@ python tests/test_data_processing.py
 - [ ] Unsupervised regime discovery — no attack labels required
 - [ ] Interactive visualization dashboard (Plotly Dash / Streamlit)
 - [ ] Deployment on enterprise-scale network telemetry
+- [ ] Enhanced documentation for easier project setup and usage
 
 ---
 
